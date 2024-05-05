@@ -1,0 +1,41 @@
+{
+  "name": "multipart-byte-range",
+  "version": "0.0.0",
+  "description": "Create multipart/byteranges stream.",
+  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    }
+  },
+  "scripts": {
+    "test": "entail",
+    "lint": "standard",
+    "coverage": "c8 --reporter html --reporter text npm test"
+  },
+  "keywords": [
+    "range",
+    "multipart",
+    "byteranges",
+    "multipart/byteranges",
+    "bytes",
+    "header",
+    "http"
+  ],
+  "author": "Alan Shaw",
+  "license": "Apache-2.0 OR MIT",
+  "files": [
+    "index*"
+  ],
+  "devDependencies": {
+    "@httpland/range-parser": "^1.2.0",
+    "c8": "^9.1.0",
+    "entail": "^2.1.2",
+    "standard": "^17.1.0"
+  },
+  "dependencies": {
+    "byteranges": "^1.1.0"
+  }
+}

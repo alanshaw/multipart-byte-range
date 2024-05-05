@@ -1,6 +1,6 @@
 # multipart-byte-range
 
-[![Build](https://github.com/alanshaw/carstream/actions/workflows/build.yml/badge.svg)](https://github.com/alanshaw/carstream/actions/workflows/build.yml)
+[![Build](https://github.com/alanshaw/carstream/actions/workflows/build.yml/badge.svg)](https://github.com/alanshaw/multipart-byte-range/actions/workflows/build.yml)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 Create `multipart/byteranges` stream.

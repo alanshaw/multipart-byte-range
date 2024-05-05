@@ -21,11 +21,13 @@ const data = new Uint8Array(138)
 // Range: bytes=3-6, 12-100, 110-
 const ranges = [[3, 6], [12, 100], [110]]
 
-new MultipartByteRange(
-  ranges,
-  async range => data.slice(range[0], range[1] == null ? undefined : (range[1] + 1)),
-  { totalSize: data.length }
-).pipeTo(new WritableStream())
+// fetch the bytes for the passed range
+const getRange = async range => data.slice(range[0], range[1] + 1)
+
+// optionally specify the total size or the content type
+const options = { totalSize: data.length, contentType: 'application/octet-stream' }
+
+new MultipartByteRange(ranges, getRange, options).pipeTo(new WritableStream())
 ```
 
 ## Contributing

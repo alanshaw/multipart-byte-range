@@ -1,60 +1,77 @@
+/**
+ * @typedef {{
+ *   header: Uint8Array
+ *   contentPromise: Promise<ReadableStream<Uint8Array>>
+ *   footer: Uint8Array
+ * }} Part
+ */
+
 const LineBreak = '\r\n'
 export const ContentType = 'application/octet-stream'
 
 /** @extends {ReadableStream<Uint8Array>} */
 export class MultipartByteRange extends ReadableStream {
   #headers
+  #length
 
   /**
    * @param {import('./index.js').Range[]} ranges
-   * @param {import('./index.js').RangeGetter} getRange
+   * @param {import('./index.js').ByteGetter} getBytes
    * @param {import('./index.js').Options} [options]
    */
-  constructor (ranges, getRange, options) {
-    /** @type {Uint8Array[]} */
-    const headers = []
-    /** @type {Uint8Array[]} */
-    const footers = []
-
-    /** @type {import('./index.js').AbsRange[]} */
-    const absRanges = ranges.map(r => {
-      let last = r[1]
-      if (last == null) {
-        if (options?.totalSize == null) {
-          throw new Error('suffix range requested but total size unknown')
-        }
-        last = options.totalSize - 1
-      }
-      const first = r[1] == null && r[0] < 0 ? last + r[0] : r[0]
-      return [first, last]
-    })
+  constructor (ranges, getBytes, options) {
+    /** @type {Part[]} */
+    const parts = []
+    /** @type {Part|undefined} */
+    let part
+    /** @type {AsyncIterator<Uint8Array>} */
+    let contentIterator
 
     super({
       async pull (controller) {
-        const range = absRanges.shift()
-        if (!range) return controller.close()
-        controller.enqueue(headers.shift())
-        controller.enqueue(await getRange(range))
-        controller.enqueue(footers.shift())
+        if (!part) {
+          part = parts.shift()
+          if (!part) return controller.close()
+  
+          controller.enqueue(part.header)
+          contentIterator = (await part.contentPromise)[Symbol.asyncIterator]()
+        }
+
+        const { done, value } = await contentIterator.next()
+        if (done) {
+          controller.enqueue(part.footer)
+
+          part = parts.shift()
+          if (!part) return controller.close()
+
+          controller.enqueue(part.header)
+          contentIterator = (await part.contentPromise)[Symbol.asyncIterator]()
+          return
+        }
+        controller.enqueue(value)
       }
     }, options?.strategy)
 
     let contentLength = 0
     const boundary = generateBoundary()
-    for (const range of absRanges) {
-      const header = encodePartHeader(boundary, range, options)
-      headers.push(header)
 
-      const footer = encodePartFooter(boundary, range === absRanges.at(-1))
-      footers.push(footer)
-
-      contentLength += header.length + (range[1] - range[0] + 1) + footer.length
+    for (const range of ranges) {
+      const absRange = resolveRange(range, options?.totalSize)
+      const header = encodePartHeader(boundary, absRange, options)
+      const footer = encodePartFooter(boundary, range === ranges.at(-1))
+      contentLength += header.length + (absRange[1] - absRange[0] + 1) + footer.length
+      parts.push({ header, contentPromise: getBytes(absRange), footer })
     }
 
     this.#headers = {
       'Content-Length': contentLength.toString(),
       'Content-Type': `multipart/byteranges; boundary=${boundary}`
     }
+    this.#length = contentLength
+  }
+
+  get length () {
+    return this.#length
   }
 
   get headers () {
@@ -88,4 +105,21 @@ const generateBoundary = () => {
     boundary += Math.floor(Math.random() * 10).toString(16)
   }
   return boundary
+}
+
+/**
+ * @param {import('./index.js').Range} range 
+ * @param {number} [totalSize]
+ * @returns {import('./index.js').AbsRange}
+ */
+const resolveRange = (range, totalSize) => {
+  let last = range[1]
+  if (last == null) {
+    if (totalSize == null) {
+      throw new Error('suffix range requested but total size unknown')
+    }
+    last = totalSize - 1
+  }
+  const first = range[1] == null && range[0] < 0 ? last + range[0] : range[0]
+  return [first, last]
 }

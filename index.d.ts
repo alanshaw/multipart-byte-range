@@ -31,7 +31,7 @@ export type AbsRange = [first: number, last: number]
  */
 export type Range = AbsRange | [first: number]
 
-export type RangeGetter = (range: AbsRange) => Promise<Uint8Array>
+export type ByteGetter = (range: AbsRange) => Promise<ReadableStream<Uint8Array>>
 
 export interface Options {
   /** Mime type of each part. */
@@ -43,8 +43,11 @@ export interface Options {
 }
 
 export class MultipartByteRange extends ReadableStream {
-  constructor (ranges: Range[], getRange: RangeGetter, options?: Options)
+  constructor (ranges: Range[], getBytes: ByteGetter, options?: Options)
+  /** HTTP headers to send. */
   readonly headers: Record<string, string>
+  /** The Content-Length of the stream. */
+  readonly length: number
 }
 
 export const ContentType = 'application/octet-stream'

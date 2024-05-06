@@ -39,7 +39,7 @@ const createServer = async (data, options) => {
     const ranges = decodeRangeHeader(req.headers.range)
     const source = new MultipartByteRange(
       ranges,
-      async range => data.slice(range[0], range[1] + 1),
+      async range => new Blob([data.slice(range[0], range[1] + 1)]).stream(),
       { totalSize: options?.unknownSize ? undefined : data.length }
     )
     console.log(`Response:`)
@@ -147,7 +147,7 @@ export const test = {
     const data = crypto.getRandomValues(new Uint8Array(10))
     assert.throws(() => new MultipartByteRange(
       [[1,2], [3]],
-      async range => data.slice(range[0], range[1] + 1)
+      async _ => new ReadableStream(),
     ), /suffix range requested but total size unknown/)
   },
 

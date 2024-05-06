@@ -16,13 +16,13 @@ npm install multipart-byte-range
 ```js
 import { MultipartByteRange } from 'multipart-byte-range'
 
-const data = new Uint8Array(138)
+const data = new Blob(['data'.repeat(500)])
 
 // Range: bytes=3-6, 12-100, 110-
 const ranges = [[3, 6], [12, 100], [110]]
 
 // fetch the bytes for the passed range
-const getRange = async range => data.slice(range[0], range[1] + 1)
+const getRange = async range => data.slice(range[0], range[1] + 1).stream()
 
 // optionally specify the total size or the content type
 const options = { totalSize: data.length, contentType: 'application/octet-stream' }

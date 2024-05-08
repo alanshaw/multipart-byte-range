@@ -6,7 +6,7 @@ import * as RangeParser from '@httpland/range-parser'
 import { MultipartByteRange, ContentType } from './index.js'
 
 /** @param {import('./index.js').Range[]} ranges */
-const encodeRangeHeader = ranges => 
+const encodeRangeHeader = ranges =>
   `bytes=${ranges.map(r => `${r[0]}${r[0] < 0 ? '' : '-'}${r[1] == null ? '' : r[1]}`).join(', ')}`
 
 /**
@@ -42,7 +42,7 @@ const createServer = async (data, options) => {
       async range => new Blob([data.slice(range[0], range[1] + 1)]).stream(),
       { totalSize: options?.unknownSize ? undefined : data.length }
     )
-    console.log(`Response:`)
+    console.log('Response:')
     for (const [k, v] of Object.entries(source.headers)) {
       console.log(`  ${k}: ${v}`)
       res.setHeader(k, v)
@@ -144,10 +144,9 @@ export const test = {
   },
 
   'should throw for suffix range of unknown size data': async (/** @type {import('entail').assert} */ assert) => {
-    const data = crypto.getRandomValues(new Uint8Array(10))
     assert.throws(() => new MultipartByteRange(
-      [[1,2], [3]],
-      async _ => new ReadableStream(),
+      [[1, 2], [3]],
+      async _ => new ReadableStream()
     ), /suffix range requested but total size unknown/)
   },
 

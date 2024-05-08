@@ -32,7 +32,7 @@ export class MultipartByteRange extends ReadableStream {
         if (!part) {
           part = parts.shift()
           if (!part) return controller.close()
-  
+
           controller.enqueue(part.header)
           contentIterator = (await part.contentPromise)[Symbol.asyncIterator]()
         }
@@ -108,7 +108,7 @@ const generateBoundary = () => {
 }
 
 /**
- * @param {import('./index.js').Range} range 
+ * @param {import('./index.js').Range} range
  * @param {number} [totalSize]
  * @returns {import('./index.js').AbsRange}
  */

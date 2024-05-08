@@ -37,5 +37,10 @@
   },
   "dependencies": {
     "byteranges": "^1.1.0"
+  },
+  "standard": {
+    "ignore": [
+      "*.ts"
+    ]
   }
 }

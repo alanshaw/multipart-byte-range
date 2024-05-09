@@ -120,6 +120,6 @@ const resolveRange = (range, totalSize) => {
     }
     last = totalSize - 1
   }
-  const first = range[1] == null && range[0] < 0 ? last + range[0] : range[0]
+  const first = range[1] == null && range[0] < 0 ? (last + 1 + range[0]) : range[0]
   return [first, last]
 }

@@ -24,6 +24,18 @@ export class MultipartByteRange extends ReadableStream {
     const parts = []
     /** @type {Part|undefined} */
     let part
+
+    let contentLength = 0
+    const boundary = generateBoundary()
+
+    for (const range of ranges) {
+      const absRange = resolveRange(range, options?.totalSize)
+      const header = encodePartHeader(boundary, absRange, options)
+      const footer = encodePartFooter(boundary, range === ranges.at(-1))
+      contentLength += header.length + (absRange[1] - absRange[0] + 1) + footer.length
+      parts.push({ header, contentPromise: getBytes(absRange), footer })
+    }
+
     /** @type {AsyncIterator<Uint8Array>} */
     let contentIterator
 
@@ -51,17 +63,6 @@ export class MultipartByteRange extends ReadableStream {
         controller.enqueue(value)
       }
     }, options?.strategy)
-
-    let contentLength = 0
-    const boundary = generateBoundary()
-
-    for (const range of ranges) {
-      const absRange = resolveRange(range, options?.totalSize)
-      const header = encodePartHeader(boundary, absRange, options)
-      const footer = encodePartFooter(boundary, range === ranges.at(-1))
-      contentLength += header.length + (absRange[1] - absRange[0] + 1) + footer.length
-      parts.push({ header, contentPromise: getBytes(absRange), footer })
-    }
 
     this.#headers = {
       'Content-Length': contentLength.toString(),

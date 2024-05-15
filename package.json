@@ -1,6 +1,6 @@
 {
   "name": "multipart-byte-range",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Create multipart/byteranges stream.",
   "main": "index.js",
   "type": "module",

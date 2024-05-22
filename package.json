@@ -1,6 +1,6 @@
 {
   "name": "multipart-byte-range",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Encode and decode multipart/byteranges stream.",
   "main": "src/index.js",
   "types": "dist/src/index.d.ts",

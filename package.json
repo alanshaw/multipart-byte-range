@@ -58,5 +58,16 @@
     "ignore": [
       "*.ts"
     ]
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alanshaw/multipart-byte-range.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alanshaw/multipart-byte-range/issues"
+  },
+  "homepage": "https://github.com/alanshaw/multipart-byte-range#readme"
 }

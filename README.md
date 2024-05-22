@@ -3,7 +3,7 @@
 [![Build](https://github.com/alanshaw/carstream/actions/workflows/build.yml/badge.svg)](https://github.com/alanshaw/multipart-byte-range/actions/workflows/build.yml)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-Create `multipart/byteranges` stream.
+Encode and decode `multipart/byteranges` stream.
 
 ## Install
 
@@ -13,8 +13,10 @@ npm install multipart-byte-range
 
 ## Usage
 
+### Create
+
 ```js
-import { MultipartByteRange } from 'multipart-byte-range'
+import { MultipartByteRangeEncoder } from 'multipart-byte-range'
 
 const data = new Blob(['data'.repeat(500)])
 
@@ -27,7 +29,25 @@ const getRange = async range => data.slice(range[0], range[1] + 1).stream()
 // optionally specify the total size or the content type
 const options = { totalSize: data.length, contentType: 'application/octet-stream' }
 
-new MultipartByteRange(ranges, getRange, options).pipeTo(new WritableStream())
+new MultipartByteRangeEncoder(ranges, getRange, options).pipeTo(new WritableStream())
+```
+
+### Parse
+
+```js
+import { MultipartByteRangeDecoder, getBoundary, decodePartHeader } from 'multipart-byte-range'
+
+const res = await fetch(url, { headers: { Range: `bytes=3-6,18-29` } })
+const boundary = getBoundary(res.headers)
+
+await res.body
+  .pipeThrough(new MultipartByteRangeDecoder(boundary))
+  .pipeTo(new WritableStream({
+    write (part) {
+      const headers = decodePartHeader(part.header)
+      const bytes = part.content
+    }
+  }))
 ```
 
 ## Contributing

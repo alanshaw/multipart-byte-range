@@ -6,7 +6,24 @@
  * [100, 200]
  * ```
  */
-export type AbsRange = [first: number, last: number]
+export type AbsoluteRange = [first: number, last: number]
+
+/**
+ * A suffix byte range - always an array of one value corresponding to the
+ * first byte to start extraction from (inclusive). e.g.
+ * 
+ * ```
+ * [900]
+ * ```
+ * 
+ * If it is unknown how large a resource is, the last `n` bytes
+ * can be requested by specifying a negative value:
+ * 
+ * ```
+ * [-100]
+ * ```
+ */
+export type SuffixRange = [first: number]
 
 /**
  * Byte range to extract - an array of one or two values corresponding to the
@@ -29,11 +46,11 @@ export type AbsRange = [first: number, last: number]
  * [-100]
  * ```
  */
-export type Range = AbsRange | [first: number]
+export type Range = AbsoluteRange | SuffixRange
 
-export type ByteGetter = (range: AbsRange) => Promise<ReadableStream<Uint8Array>>
+export type ByteGetter = (range: AbsoluteRange) => Promise<ReadableStream<Uint8Array>>
 
-export interface Options {
+export interface EncoderOptions {
   /** Mime type of each part. */
   contentType?: string
   /** Total size of the object in bytes. */
@@ -41,13 +58,3 @@ export interface Options {
   /** Stream queuing strategy. */
   strategy?: QueuingStrategy<Uint8Array>
 }
-
-export class MultipartByteRange extends ReadableStream {
-  constructor (ranges: Range[], getBytes: ByteGetter, options?: Options)
-  /** HTTP headers to send. */
-  readonly headers: Record<string, string>
-  /** The Content-Length of the stream. */
-  readonly length: number
-}
-
-export const ContentType = 'application/octet-stream'

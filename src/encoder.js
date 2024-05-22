@@ -1,23 +1,23 @@
-/**
- * @typedef {{
- *   header: Uint8Array
- *   contentPromise: Promise<ReadableStream<Uint8Array>>
- *   footer: Uint8Array
- * }} Part
- */
+// eslint-disable-next-line
+import * as API from './api.js'
 
 const LineBreak = '\r\n'
 export const ContentType = 'application/octet-stream'
 
 /** @extends {ReadableStream<Uint8Array>} */
-export class MultipartByteRange extends ReadableStream {
+export class MultipartByteRangeEncoder extends ReadableStream {
   #headers
   #length
 
   /**
-   * @param {import('./index.js').Range[]} ranges
-   * @param {import('./index.js').ByteGetter} getBytes
-   * @param {import('./index.js').Options} [options]
+   * @typedef {{
+   *   header: Uint8Array
+   *   contentPromise: Promise<ReadableStream<Uint8Array>>
+   *   footer: Uint8Array
+   * }} Part
+   * @param {API.Range[]} ranges
+   * @param {API.ByteGetter} getBytes
+   * @param {API.EncoderOptions} [options]
    */
   constructor (ranges, getBytes, options) {
     /** @type {Part[]} */
@@ -46,6 +46,7 @@ export class MultipartByteRange extends ReadableStream {
           if (!part) return controller.close()
 
           controller.enqueue(part.header)
+          // @ts-expect-error wen types for async iterable ReadbleStreams?
           contentIterator = (await part.contentPromise)[Symbol.asyncIterator]()
         }
 
@@ -57,6 +58,7 @@ export class MultipartByteRange extends ReadableStream {
           if (!part) return controller.close()
 
           controller.enqueue(part.header)
+          // @ts-expect-error wen types for async iterable ReadbleStreams?
           contentIterator = (await part.contentPromise)[Symbol.asyncIterator]()
           return
         }
@@ -82,8 +84,8 @@ export class MultipartByteRange extends ReadableStream {
 
 /**
  * @param {string} boundary
- * @param {import('./index.js').Range} range
- * @param {import('./index.js').Options} [options]
+ * @param {API.Range} range
+ * @param {API.EncoderOptions} [options]
  */
 const encodePartHeader = (boundary, range, options) => {
   const contentType = options?.contentType ?? ContentType
@@ -109,9 +111,9 @@ const generateBoundary = () => {
 }
 
 /**
- * @param {import('./index.js').Range} range
+ * @param {API.Range} range
  * @param {number} [totalSize]
- * @returns {import('./index.js').AbsRange}
+ * @returns {API.AbsoluteRange}
  */
 const resolveRange = (range, totalSize) => {
   let last = range[1]

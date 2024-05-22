@@ -1,16 +1,25 @@
 {
   "name": "multipart-byte-range",
   "version": "2.0.2",
-  "description": "Create multipart/byteranges stream.",
+  "description": "Encode and decode multipart/byteranges stream.",
   "main": "index.js",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./index.js",
-      "types": "./index.d.ts"
+      "import": "./src/index.js",
+      "types": "./dist/src/index.d.ts"
+    },
+    "./decoder": {
+      "import": "./src/decoder.js",
+      "types": "./dist/src/decoder.d.ts"
+    },
+    "./encoder": {
+      "import": "./src/encoder.js",
+      "types": "./dist/src/encoder.d.ts"
     }
   },
   "scripts": {
+    "build": "tsc --build",
     "test": "entail",
     "lint": "standard",
     "coverage": "c8 --reporter html --reporter text npm test"
@@ -22,21 +31,28 @@
     "multipart/byteranges",
     "bytes",
     "header",
-    "http"
+    "http",
+    "parse",
+    "parser",
+    "encode",
+    "decode"
   ],
   "author": "Alan Shaw",
   "license": "Apache-2.0 OR MIT",
   "files": [
-    "index*"
+    "src",
+    "dist"
   ],
   "devDependencies": {
     "@httpland/range-parser": "^1.2.0",
     "c8": "^9.1.0",
     "entail": "^2.1.2",
-    "standard": "^17.1.0"
+    "standard": "^17.1.0",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
-    "byteranges": "^1.1.0"
+    "streamsearch-web": "^1.0.0",
+    "uint8arraylist": "^2.4.8"
   },
   "standard": {
     "ignore": [

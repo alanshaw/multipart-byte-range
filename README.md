@@ -13,7 +13,7 @@ npm install multipart-byte-range
 
 ## Usage
 
-### Create
+### Encode
 
 ```js
 import { MultipartByteRangeEncoder } from 'multipart-byte-range'
@@ -32,7 +32,7 @@ const options = { totalSize: data.length, contentType: 'application/octet-stream
 new MultipartByteRangeEncoder(ranges, getRange, options).pipeTo(new WritableStream())
 ```
 
-### Parse
+### Decode
 
 ```js
 import { MultipartByteRangeDecoder, getBoundary, decodePartHeader } from 'multipart-byte-range'
